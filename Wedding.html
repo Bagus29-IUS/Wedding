@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undangan Pernikahan — Finotia & Ade</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap"
+        rel="stylesheet">
+
+    <!-- GSAP + Plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/CustomEase.min.js"></script>
+
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --blush: #f2d0d5;
+            --rose: #c97b8f;
+            --deep-rose: #a85a70;
+            --dusty: #d4a5b0;
+            --sage: #b2c4af;
+            --cream: #fdf5ee;
+            --ivory: #f8ede2;
+            --warm: #e8d2be;
+            --text: #3d2b33;
+            --mid: #7a5460;
+            --light: #b89aa2;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* ── CUSTOM CURSOR ── */
+        #cursor {
+            width: 12px;
+            height: 12px;
+            background: var(--rose);
+            border-radius: 50%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: multiply;
+            transition: transform 0.15s ease;
+        }
+
+        #cursor-ring {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--rose);
+            border-radius: 50%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.5;
+        }
+
+        /* ── CANVAS (particles) ── */
+        #petal-canvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0;
+        }
+
+        /* ── COVER ── */
+        #cover {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: linear-gradient(145deg, #fce8ed 0%, #f5dce3 45%, #e8d0d8 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .cover-bg-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(201, 123, 143, 0.2);
+            pointer-events: none;
+        }
+
+        .cover-letter {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: clamp(5rem, 15vw, 10rem);
+            font-weight: 300;
+            color: var(--text);
+            line-height: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover-letter span {
+            display: inline-block;
+            transform: translateY(110%);
+        }
+
+        .cover-amp-big {
+            font-size: clamp(2.5rem, 7vw, 4.5rem);
+            color: var(--rose);
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            opacity: 0;
+            transform: scale(0.5) rotate(-10deg);
+            display: block;
+            text-align: center;
+            margin: 0.3rem 0;
+        }
+
+        .cover-sub {
+            font-size: 0.62rem;
+            letter-spacing: 0.55em;
+            color: var(--mid);
+            text-transform: uppercase;
+            opacity: 0;
+            margin-top: 2.5rem;
+        }
+
+        .cover-date-reveal {
+            font-size: 0.68rem;
+            letter-spacing: 0.4em;
+            color: var(--rose);
+            text-transform: uppercase;
+            opacity: 0;
+            margin-top: 0.6rem;
+        }
+
+        .open-pulse {
+            margin-top: 3.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .open-pulse span {
+            font-size: 0.6rem;
+            letter-spacing: 0.5em;
+            color: var(--mid);
+            text-transform: uppercase;
+        }
+
+        .pulse-ring {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 1px solid var(--rose);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .pulse-ring::before,
+        .pulse-ring::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 1px solid var(--rose);
+            animation: pulseRing 2s ease-out infinite;
+        }
+
+        .pulse-ring::after {
+            animation-delay: 1s;
+        }
+
+        @keyframes pulseRing {
+            0% {
+                transform: scale(1);
+                opacity: 0.6
+            }
+
+            100% {
+                transform: scale(2.2);
+                opacity: 0
+            }
+        }
+
+        .pulse-arrow {
+            width: 14px;
+            height: 14px;
+            border-right: 1px solid var(--rose);
+            border-bottom: 1px solid var(--rose);
+            transform: rotate(45deg);
+            margin-top: -4px;
+        }
+
+        /* ── TRANSITION CURTAIN ── */
+        #curtain {
+            position: fixed;
+            inset: 0;
+            z-index: 150;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            pointer-events: none;
+        }
+
+        .curtain-strip {
+            height: 100%;
+            background: var(--text);
+            transform: scaleY(0);
+            transform-origin: top;
+        }
+
+        /* ── MAIN ── */
+        #main {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ── SECTION BASE ── */
+        section {
+            position: relative;
+            overflow: hidden;
+            padding: 7rem 2rem;
+        }
+
+        .inner {
+            max-width: 680px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        /* ── HERO ── */
+        #hero {
+            min-height: 100svh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(180deg, #fce8ed 0%, var(--cream) 70%);
+        }
+
+        .hero-eyebrow {
+            font-size: 0.6rem;
+            letter-spacing: 0.55em;
+            color: var(--rose);
+            text-transform: uppercase;
+            clip-path: inset(0 100% 0 0);
+        }
+
+        .hero-name {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-weight: 300;
+            font-size: clamp(3.2rem, 9vw, 5.8rem);
+            line-height: 1.05;
+            color: var(--text);
+            overflow: hidden;
+        }
+
+        .hero-name .line {
+            display: block;
+            transform: translateY(100%);
+        }
+
+        .hero-amp {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            color: var(--rose);
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            display: block;
+            margin: 0.3em 0;
+            opacity: 0;
+            transform: scale(0.3);
+        }
+
+        .hero-tagline {
+            font-weight: 200;
+            font-size: 0.78rem;
+            letter-spacing: 0.2em;
+            color: var(--mid);
+            opacity: 0;
+            transform: translateY(20px);
+            margin-top: 2.5rem;
+        }
+
+        .hero-line {
+            width: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--rose), transparent);
+            margin: 2rem auto;
+        }
+
+        /* ── FLOATING PETAL ELEMENTS ── */
+        .scene-petal {
+            position: absolute;
+            pointer-events: none;
+            border-radius: 50% 0 50% 0;
+            opacity: 0;
+        }
+
+        /* ── VERSE ── */
+        #verse {
+            background: var(--ivory);
+        }
+
+        .verse-ornament {
+            font-size: 2.5rem;
+            color: var(--rose);
+            opacity: 0;
+            transform: scale(0) rotate(-180deg);
+            display: block;
+            margin-bottom: 1.5rem;
+        }
+
+        .arabic-text {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+            font-style: italic;
+            color: var(--rose);
+            line-height: 1.7;
+            clip-path: inset(0 0 100% 0);
+            margin-bottom: 1.5rem;
+        }
+
+        .verse-body {
+            font-weight: 200;
+            font-size: 0.83rem;
+            line-height: 2.2;
+            color: var(--mid);
+            letter-spacing: 0.04em;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .verse-ref {
+            font-size: 0.65rem;
+            letter-spacing: 0.3em;
+            color: var(--dusty);
+            margin-top: 1rem;
+            opacity: 0;
+        }
+
+        /* ── COUPLE ── */
+        #couple {
+            background: linear-gradient(160deg, var(--cream) 0%, #fce8ed 100%);
+        }
+
+        .couple-eyebrow,
+        .couple-title {
+            opacity: 0;
+            transform: translateY(25px);
+        }
+
+        .couple-title {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-weight: 300;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            color: var(--text);
+            margin-top: 0.5rem;
+            margin-bottom: 3.5rem;
+        }
+
+        .couple-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .person-card {
+            flex: 1;
+            min-width: 200px;
+            max-width: 240px;
+            opacity: 0;
+            transform: translateY(50px) rotateX(15deg);
+            transform-origin: bottom;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            border: 1px solid rgba(201, 123, 143, 0.15);
+            box-shadow: 0 8px 40px rgba(201, 123, 143, 0.1);
+            transition: box-shadow 0.3s, transform 0.3s;
+        }
+
+        .person-card:hover {
+            box-shadow: 0 16px 50px rgba(201, 123, 143, 0.2);
+            transform: translateY(-6px) !important;
+        }
+
+        .avatar-ring {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            margin: 0 auto 1.2rem;
+            background: linear-gradient(135deg, var(--blush), var(--warm));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-style: italic;
+            color: var(--rose);
+            border: 2px solid rgba(201, 123, 143, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-ring::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent);
+            border-radius: 50%;
+        }
+
+        .p-name {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.5rem;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .p-role {
+            font-size: 0.65rem;
+            letter-spacing: 0.25em;
+            color: var(--rose);
+            text-transform: uppercase;
+            margin-bottom: 0.8rem;
+        }
+
+        .p-parents {
+            font-size: 0.73rem;
+            font-weight: 200;
+            color: var(--mid);
+            line-height: 1.7;
+        }
+
+        .couple-connector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            opacity: 0;
+            transform: scale(0) rotate(180deg);
+        }
+
+        .conn-heart {
+            font-size: 1.8rem;
+        }
+
+        .conn-line {
+            width: 1px;
+            height: 30px;
+            background: var(--dusty);
+            opacity: 0.4;
+        }
+
+        /* ── EVENT ── */
+        #event {
+            background: var(--ivory);
+        }
+
+        .ev-eyebrow,
+        .ev-title {
+            opacity: 0;
+            transform: translateY(25px);
+        }
+
+        .ev-title {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-weight: 300;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            color: var(--text);
+            margin-bottom: 3rem;
+        }
+
+        .ev-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media(max-width:480px) {
+            .ev-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .ev-card {
+            background: white;
+            border-radius: 18px;
+            padding: 2rem 1.5rem;
+            border: 1px solid rgba(201, 123, 143, 0.12);
+            box-shadow: 0 4px 24px rgba(201, 123, 143, 0.07);
+            opacity: 0;
+            transform: translateY(60px) skewY(3deg);
+            transition: box-shadow 0.3s, transform 0.3s;
+        }
+
+        .ev-card:hover {
+            box-shadow: 0 12px 40px rgba(201, 123, 143, 0.18);
+            transform: translateY(-4px) skewY(0deg) !important;
+        }
+
+        .ev-icon {
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+        }
+
+        .ev-badge {
+            display: inline-block;
+            font-size: 0.6rem;
+            letter-spacing: 0.3em;
+            color: var(--rose);
+            text-transform: uppercase;
+            border: 1px solid rgba(201, 123, 143, 0.3);
+            border-radius: 20px;
+            padding: 0.2rem 0.7rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .ev-time {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-style: italic;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .ev-detail {
+            font-size: 0.75rem;
+            font-weight: 200;
+            color: var(--mid);
+            line-height: 1.8;
+        }
+
+        /* ── COUNTDOWN ── */
+        #countdown {
+            background: linear-gradient(160deg, #f5dce3 0%, #e8d0d8 100%);
+            text-align: center;
+        }
+
+        .cd-label {
+            font-size: 0.6rem;
+            letter-spacing: 0.5em;
+            color: var(--deep-rose);
+            text-transform: uppercase;
+            opacity: 0;
+        }
+
+        .cd-title {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-weight: 300;
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            color: var(--text);
+            margin: 0.5rem 0 3rem;
+            opacity: 0;
+        }
+
+        .cd-grid {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .cd-unit {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(201, 123, 143, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem 1.2rem 1rem;
+            min-width: 80px;
+            opacity: 0;
+            transform: translateY(30px) scale(0.8);
+        }
+
+        .cd-num {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 7vw, 3.2rem);
+            font-weight: 300;
+            color: var(--text);
+            display: block;
+            line-height: 1;
+        }
+
+        .cd-lbl {
+            font-size: 0.58rem;
+            letter-spacing: 0.3em;
+            color: var(--mid);
+            text-transform: uppercase;
+            margin-top: 0.4rem;
+            display: block;
+        }
+
+        /* ── RSVP ── */
+        #rsvp {
+            background: var(--cream);
+        }
+
+        .rv-eyebrow,
+        .rv-title {
+            opacity: 0;
+            transform: translateY(25px);
+        }
+
+        .rv-title {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-weight: 300;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            color: var(--text);
+            margin-bottom: 2rem;
+        }
+
+        .rsvp-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem 2rem;
+            border: 1px solid rgba(201, 123, 143, 0.12);
+            box-shadow: 0 8px 50px rgba(201, 123, 143, 0.1);
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        .fg {
+            margin-bottom: 1.3rem;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 0.63rem;
+            letter-spacing: 0.22em;
+            color: var(--mid);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1.5px solid rgba(201, 123, 143, 0.2);
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 300;
+            color: var(--text);
+            background: var(--cream);
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+            appearance: none;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--rose);
+            box-shadow: 0 0 0 3px rgba(201, 123, 143, 0.1);
+            background: white;
+        }
+
+        textarea {
+            resize: none;
+            height: 90px;
+        }
+
+        .att-toggle {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+        }
+
+        .att-opt {
+            position: relative;
+        }
+
+        .att-opt input[type=radio] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+        }
+
+        .att-opt label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8rem;
+            border: 1.5px solid rgba(201, 123, 143, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            transition: all 0.3s;
+            background: var(--cream);
+            text-transform: none;
+            color: var(--mid);
+            gap: 0.4rem;
+        }
+
+        .att-opt input:checked+label {
+            background: var(--blush);
+            border-color: var(--rose);
+            color: var(--text);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--rose), var(--deep-rose));
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 300;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 6px 24px rgba(168, 90, 112, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), transparent);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(168, 90, 112, 0.4);
+        }
+
+        .success-msg {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.4rem;
+            color: var(--rose);
+            line-height: 1.6;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: linear-gradient(160deg, #fce8ed, #f5dce3);
+            padding: 5rem 2rem;
+            text-align: center;
+        }
+
+        .ft-names {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-weight: 300;
+            font-size: 2.2rem;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+            opacity: 0;
+        }
+
+        .ft-note {
+            font-size: 0.75rem;
+            font-weight: 200;
+            color: var(--mid);
+            letter-spacing: 0.08em;
+            line-height: 2.2;
+            opacity: 0;
+        }
+
+        .ft-close {
+            font-style: italic;
+            color: var(--rose);
+        }
+
+        /* ── DECO ── */
+        .deco-line {
+            width: 1px;
+            height: 60px;
+            background: linear-gradient(to bottom, transparent, var(--rose), transparent);
+            margin: 0 auto;
+            opacity: 0.4;
+        }
+
+        /* ── SECTION REVEAL CLIP ── */
+        .clip-reveal {
+            clip-path: inset(0 0 100% 0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="cursor"></div>
+    <div id="cursor-ring"></div>
+    <canvas id="petal-canvas"></canvas>
+
+    <!-- TRANSITION CURTAIN -->
+    <div id="curtain">
+        <div class="curtain-strip"></div>
+        <div class="curtain-strip"></div>
+        <div class="curtain-strip"></div>
+        <div class="curtain-strip"></div>
+        <div class="curtain-strip"></div>
+    </div>
+
+    <!-- ══ COVER ══ -->
+    <div id="cover">
+        <!-- bg rings -->
+        <div class="cover-bg-ring" style="width:600px;height:600px;top:50%;left:50%;transform:translate(-50%,-50%)">
+        </div>
+        <div class="cover-bg-ring" style="width:400px;height:400px;top:50%;left:50%;transform:translate(-50%,-50%)">
+        </div>
+        <div class="cover-bg-ring" style="width:200px;height:200px;top:50%;left:50%;transform:translate(-50%,-50%)">
+        </div>
+
+        <div style="text-align:center;z-index:2;">
+            <p style="font-size:0.6rem;letter-spacing:0.55em;color:var(--mid);text-transform:uppercase;margin-bottom:2rem;opacity:0"
+                id="cv-invite">Undangan Pernikahan</p>
+
+            <div class="cover-letter" id="cv-R"><span>F</span></div>
+            <div class="cover-amp-big" id="cv-amp">&</div>
+            <div class="cover-letter" id="cv-F"><span>A</span></div>
+
+            <p class="cover-sub" id="cv-sub">Finotia Anjani &nbsp;·&nbsp; Ade</p>
+            <p class="cover-date-reveal" id="cv-date">25 · 03 · 2026</p>
+
+            <div class="open-pulse" id="cv-open" onclick="openInvitation()">
+                <span>Buka Undangan</span>
+                <div class="pulse-ring">
+                    <div class="pulse-arrow"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MAIN ══ -->
+    <div id="main">
+
+        <!-- HERO -->
+        <section id="hero">
+            <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none">
+                <div class="scene-petal" id="sp1"
+                    style="width:80px;height:80px;background:var(--blush);top:15%;left:5%"></div>
+                <div class="scene-petal" id="sp2" style="width:50px;height:50px;background:var(--sage);top:70%;left:8%">
+                </div>
+                <div class="scene-petal" id="sp3"
+                    style="width:65px;height:65px;background:var(--dusty);top:25%;right:6%"></div>
+                <div class="scene-petal" id="sp4"
+                    style="width:40px;height:40px;background:var(--rose);top:65%;right:10%"></div>
+                <div class="scene-petal" id="sp5"
+                    style="width:90px;height:90px;background:var(--warm);top:45%;left:3%;opacity:0.04!important"></div>
+            </div>
+            <div class="inner">
+                <p class="hero-eyebrow" id="he-ey">Bismillahirrahmanirrahim</p>
+                <div class="hero-line" id="he-line"></div>
+                <div class="hero-name"><span class="line" id="hn1">Finotia Anjani</span></div>
+                <span class="hero-amp" id="he-amp">&</span>
+                <div class="hero-name"><span class="line" id="hn2">Ade</span></div>
+                <div class="hero-line" id="he-line2" style="margin-top:2rem"></div>
+                <p class="hero-tagline" id="he-tag">Menyatu dalam ikatan suci yang penuh berkah</p>
+            </div>
+        </section>
+
+        <!-- VERSE -->
+        <section id="verse">
+            <div class="inner">
+                <span class="verse-ornament" id="vo">✦</span>
+                <p class="arabic-text" id="ar">"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu
+                    istri-istri dari jenismu sendiri"</p>
+                <p class="verse-body" id="vb">
+                    supaya kamu cenderung dan merasa tenteram kepadanya,<br>
+                    dan dijadikan-Nya di antaramu rasa kasih dan sayang.<br>
+                    Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda bagi kaum yang berfikir.
+                </p>
+                <p class="verse-ref" id="vr">— QS. Ar-Rum : 21</p>
+            </div>
+        </section>
+
+        <!-- COUPLE -->
+        <section id="couple">
+            <div class="inner">
+                <p class="couple-eyebrow"
+                    style="font-size:0.6rem;letter-spacing:0.5em;color:var(--rose);text-transform:uppercase;margin-bottom:0.7rem">
+                    Mempelai</p>
+                <h2 class="couple-title">Dua Jiwa, Satu Ikatan</h2>
+                <div class="couple-row">
+                    <div class="person-card" id="bride-card">
+                        <div class="avatar-ring">R</div>
+                        <p class="p-name">Finotia Anjani</p>
+                        <p class="p-role">Mempelai Wanita</p>
+                        <p class="p-parents">Putri pertama dari<br>Bpk. Sutarno<br>& Ibu Sri Fajar Wati</p>
+                    </div>
+                    <div class="couple-connector" id="conn">
+                        <div class="conn-line"></div>
+                        <div class="conn-heart">🌸</div>
+                        <div class="conn-line"></div>
+                    </div>
+                    <div class="person-card" id="groom-card">
+                        <div class="avatar-ring">F</div>
+                        <p class="p-name">Ade</p>
+                        <p class="p-role">Mempelai Pria</p>
+                        <p class="p-parents">Putra kedua dari<br>Bpk. Hendra Santoso<br>& Ibu Dewi Lestari</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- EVENT -->
+        <section id="event">
+            <div class="inner">
+                <p class="ev-eyebrow"
+                    style="font-size:0.6rem;letter-spacing:0.5em;color:var(--rose);text-transform:uppercase;margin-bottom:0.7rem">
+                    Rangkaian Acara</p>
+                <h2 class="ev-title">Hari Bahagia Kami</h2>
+                <div class="ev-grid">
+                    <div class="ev-card" id="ec1">
+                        <div class="ev-icon">💍</div>
+                        <span class="ev-badge">Akad Nikah</span>
+                        <p class="ev-time">08.00 — 10.00 WIB</p>
+                        <p class="ev-detail">Sabtu, 25 Maret 2025<br>Masjid Al-Muhajirin<br>Jl. Melati No. 7, Bandung
+                        </p>
+                    </div>
+                    <div class="ev-card" id="ec2">
+                        <div class="ev-icon">🌸</div>
+                        <span class="ev-badge">Resepsi</span>
+                        <p class="ev-time">11.00 — 15.00 WIB</p>
+                        <p class="ev-detail">Minggu, 26 Juli 2025<br>Gedung Graha Bunga<br>Jl. Kertamanah No. 12,
+                            Bandung
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COUNTDOWN -->
+        <section id="countdown">
+            <p class="cd-label">Menghitung Hari</p>
+            <h2 class="cd-title">Hari Istimewa Kami</h2>
+            <div class="cd-grid">
+                <div class="cd-unit" id="cdu-d"><span class="cd-num" id="cd-days">00</span><span
+                        class="cd-lbl">Hari</span></div>
+                <div class="cd-unit" id="cdu-h"><span class="cd-num" id="cd-hours">00</span><span
+                        class="cd-lbl">Jam</span></div>
+                <div class="cd-unit" id="cdu-m"><span class="cd-num" id="cd-min">00</span><span
+                        class="cd-lbl">Menit</span></div>
+                <div class="cd-unit" id="cdu-s"><span class="cd-num" id="cd-sec">00</span><span
+                        class="cd-lbl">Detik</span></div>
+            </div>
+        </section>
+
+        <!-- RSVP -->
+        <section id="rsvp">
+            <div class="inner">
+                <p class="rv-eyebrow"
+                    style="font-size:0.6rem;letter-spacing:0.5em;color:var(--rose);text-transform:uppercase;margin-bottom:0.7rem">
+                    Konfirmasi Kehadiran</p>
+                <h2 class="rv-title">Kami Menanti Kehadiranmu</h2>
+                <div class="rsvp-card" id="rv-card">
+                    <div class="fg">
+                        <label>Nama Lengkap</label>
+                        <input type="text" id="fname" placeholder="Masukkan nama kamu...">
+                    </div>
+                    <div class="fg">
+                        <label>Kehadiran</label>
+                        <div class="att-toggle">
+                            <div class="att-opt"><input type="radio" name="att" id="yes" value="yes"><label for="yes">✓
+                                    Hadir</label></div>
+                            <div class="att-opt"><input type="radio" name="att" id="no" value="no"><label for="no">✗
+                                    Berhalangan</label></div>
+                        </div>
+                    </div>
+                    <div class="fg">
+                        <label>Jumlah Tamu</label>
+                        <select id="guests">
+                            <option value="">Pilih jumlah...</option>
+                            <option>1 orang</option>
+                            <option>2 orang</option>
+                            <option>3 orang</option>
+                            <option>4 orang</option>
+                            <option>5+ orang</option>
+                        </select>
+                    </div>
+                    <div class="fg">
+                        <label>Ucapan & Doa</label>
+                        <textarea id="wish" placeholder="Tuliskan doa dan harapanmu untuk kami..."></textarea>
+                    </div>
+                    <button class="submit-btn" onclick="submitRSVP()">Kirim Konfirmasi</button>
+                    <div class="success-msg" id="suc">
+                        🌸 Terima kasih atas doa dan kehadiranmu! 🌸<br>
+                        <span style="font-size:0.85rem;color:var(--mid)">Kami tidak sabar bertemu denganmu</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="deco-line" style="margin-bottom:2rem"></div>
+            <p class="ft-names" id="ft-n">Raisya & Farhan</p>
+            <p class="ft-note" id="ft-t">
+                Merupakan suatu kebahagiaan dan kehormatan bagi kami<br>
+                apabila Bapak/Ibu/Saudara/i berkenan hadir<br>
+                untuk memberikan doa restu kepada kami.<br><br>
+                <span class="ft-close">Wassalamualaikum Warahmatullahi Wabarakatuh</span>
+            </p>
+            <div class="deco-line" style="margin-top:2rem"></div>
+        </footer>
+
+    </div><!-- /main -->
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger, TextPlugin, CustomEase);
+
+        // ── CUSTOM EASE ──
+        CustomEase.create("antigrav", "M0,0 C0.126,0.382 0.282,0.674 0.44,0.822 C0.632,1.0 0.818,1.04 1,1");
+        CustomEase.create("bloom", "M0,0 C0.0,0.5 0.5,1.2 0.75,1.05 C0.9,0.98 1.0,1.0 1,1");
+
+        // ── CURSOR ──
+        const cur = document.getElementById('cursor');
+        const curR = document.getElementById('cursor-ring');
+        let mx = 0, my = 0, rx = 0, ry = 0;
+        document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+        gsap.ticker.add(() => {
+            gsap.set(cur, { x: mx - 6, y: my - 6 });
+            rx += (mx - 36 - rx) * 0.12; ry += (my - 36 - ry) * 0.12;
+            gsap.set(curR, { x: rx, y: ry });
+        });
+        document.querySelectorAll('button,.open-pulse,.person-card,.ev-card,.att-opt label').forEach(el => {
+            el.addEventListener('mouseenter', () => gsap.to(cur, { scale: 2.5, duration: 0.3, ease: 'power2.out' }));
+            el.addEventListener('mouseleave', () => gsap.to(cur, { scale: 1, duration: 0.3, ease: 'power2.out' }));
+        });
+
+        // ── COVER INTRO TIMELINE ──
+        const coverTL = gsap.timeline({ delay: 0.3 });
+        coverTL
+            .to('#cv-invite', { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' })
+            .to('#cv-R span', { y: '0%', duration: 1, ease: 'antigrav' }, '-=0.3')
+            .to('#cv-amp', { opacity: 1, scale: 1, rotation: 0, duration: 0.8, ease: 'bloom' }, '-=0.5')
+            .to('#cv-F span', { y: '0%', duration: 1, ease: 'antigrav' }, '-=0.6')
+            .to('#cv-sub', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.3')
+            .to('#cv-date', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.5')
+            .to('#cv-open', { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.3');
+
+        // Pulse rings
+        gsap.to('.cover-bg-ring', {
+            scale: 1.05, duration: 3, ease: 'sine.inOut', yoyo: true, repeat: -1, stagger: 0.8
+        });
+
+        // ── OPEN INVITATION ──
+        function openInvitation() {
+            const tl = gsap.timeline();
+
+            // 1. Elements implode to center
+            tl.to(['#cv-R', '#cv-F'], {
+                y: -30, scale: 0.8, opacity: 0,
+                duration: 0.5, ease: 'power3.in', stagger: 0.05
+            })
+                .to(['#cv-amp', '#cv-sub', '#cv-date', '#cv-open', '#cv-invite'], {
+                    opacity: 0, scale: 0.5, duration: 0.4, ease: 'power2.in', stagger: 0.04
+                }, '-=0.4')
+
+                // 2. Curtain strips drop in staggered
+                .set('.curtain-strip', { scaleY: 0, transformOrigin: 'top' })
+                .to('.curtain-strip', {
+                    scaleY: 1, duration: 0.5, ease: 'power3.inOut', stagger: 0.06
+                }, '-=0.1')
+
+                // 3. Cover sweeps up
+                .to('#cover', { y: '-110%', duration: 0.7, ease: 'power3.inOut' }, '-=0.1')
+
+                // 4. Curtain strips retract upward
+                .set('.curtain-strip', { transformOrigin: 'bottom' })
+                .to('.curtain-strip', {
+                    scaleY: 0, duration: 0.6, ease: 'power3.inOut', stagger: { amount: 0.25, from: 'edges' }
+                })
+
+                // 5. Main appears
+                .to('#main', { opacity: 1, duration: 0.01, ease: 'none' }, '-=0.5')
+                .call(() => { document.getElementById('main').style.pointerEvents = 'all'; })
+
+                // 6. Petals canvas burst
+                .to('#petal-canvas', { opacity: 1, duration: 0.5 }, '-=0.4')
+                .call(() => { startPetalBurst(); })
+
+                // 7. Hero animate in
+                .to('#he-ey', { clipPath: 'inset(0 0% 0 0)', duration: 1, ease: 'power3.out' }, '-=0.3')
+                .to('#he-line', { width: '120px', duration: 0.8, ease: 'power2.out' }, '-=0.6')
+                .to('#hn1', { y: '0%', duration: 1, ease: 'antigrav' }, '-=0.5')
+                .to('#he-amp', { opacity: 1, scale: 1, rotation: 0, duration: 0.7, ease: 'bloom' }, '-=0.5')
+                .to('#hn2', { y: '0%', duration: 1, ease: 'antigrav' }, '-=0.6')
+                .to('#he-line2', { width: '120px', duration: 0.8, ease: 'power2.out' }, '-=0.5')
+                .to('#he-tag', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, '-=0.4')
+                .call(() => {
+                    animateScenePetals();
+                    initScrollAnimations();
+                    startCountdown();
+                });
+        }
+
+        // ── CANVAS PETAL BURST ──
+        const canvas = document.getElementById('petal-canvas');
+        const ctx = canvas.getContext('2d');
+        let petals = [];
+        let animId;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        function createPetal() {
+            const colors = ['#f2d0d5', '#c97b8f', '#d4a5b0', '#b2c4af', '#e8d2be', '#f5dce3'];
+            return {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height * 0.5 - 100,
+                vx: (Math.random() - 0.5) * 3,
+                vy: Math.random() * 2 + 0.5,
+                rot: Math.random() * 360,
+                vrot: (Math.random() - 0.5) * 4,
+                size: Math.random() * 14 + 6,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                alpha: Math.random() * 0.6 + 0.2,
+                life: 1, decay: Math.random() * 0.003 + 0.002
+            };
+        }
+
+        function startPetalBurst() {
+            petals = [];
+            for (let i = 0; i < 80; i++) {
+                const p = createPetal();
+                p.y = -Math.random() * 200;
+                p.vy = Math.random() * 4 + 1;
+                petals.push(p);
+            }
+            animatePetals();
+            // keep adding petals slowly
+            let spawnCount = 0;
+            const spawner = setInterval(() => {
+                if (spawnCount++ > 30) { clearInterval(spawner); return; }
+                for (let i = 0; i < 3; i++) petals.push(createPetal());
+            }, 400);
+        }
+
+        function animatePetals() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            petals.forEach(p => {
+                p.x += p.vx; p.y += p.vy; p.rot += p.vrot;
+                p.vx += (Math.random() - 0.5) * 0.1;
+                p.vy += 0.02;
+                p.life -= p.decay;
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rot * Math.PI / 180);
+                ctx.globalAlpha = p.alpha * Math.max(0, p.life);
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.ellipse(0, 0, p.size, p.size * 0.6, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+            petals = petals.filter(p => p.life > 0 && p.y < canvas.height + 50);
+            if (petals.length > 0) animId = requestAnimationFrame(animatePetals);
+            else gsap.to('#petal-canvas', { opacity: 0, duration: 1 });
+        }
+
+        // ── SCENE PETALS FLOAT ──
+        function animateScenePetals() {
+            const ids = ['#sp1', '#sp2', '#sp3', '#sp4', '#sp5'];
+            ids.forEach((id, i) => {
+                gsap.to(id, { opacity: i === 4 ? 0.04 : 0.25, duration: 1, delay: 0.3 * i });
+                gsap.to(id, {
+                    y: `${-20 - i * 10}`,
+                    x: i % 2 === 0 ? 15 : -15,
+                    rotation: 25 + (i * 10),
+                    duration: 3 + i * 0.5,
+                    ease: 'sine.inOut', yoyo: true, repeat: -1, delay: i * 0.4
+                });
+            });
+        }
+
+        // ── SCROLL ANIMATIONS ──
+        function initScrollAnimations() {
+
+            // verse
+            gsap.to('#vo', {
+                scrollTrigger: { trigger: '#verse', start: 'top 75%' },
+                opacity: 1, scale: 1, rotation: 0, duration: 1, ease: 'bloom'
+            });
+            gsap.to('#ar', {
+                scrollTrigger: { trigger: '#verse', start: 'top 70%' },
+                clipPath: 'inset(0 0% 0 0)', duration: 1.2, delay: 0.3, ease: 'power3.out'
+            });
+            gsap.to('#vb', {
+                scrollTrigger: { trigger: '#verse', start: 'top 65%' },
+                opacity: 1, y: 0, duration: 1, delay: 0.6, ease: 'power3.out'
+            });
+            gsap.to('#vr', {
+                scrollTrigger: { trigger: '#verse', start: 'top 60%' },
+                opacity: 1, duration: 0.8, delay: 1, ease: 'power2.out'
+            });
+
+            // couple
+            gsap.to('.couple-eyebrow', {
+                scrollTrigger: { trigger: '#couple', start: 'top 78%' },
+                opacity: 1, y: 0, duration: 0.8, ease: 'power2.out'
+            });
+            gsap.to('.couple-title', {
+                scrollTrigger: { trigger: '#couple', start: 'top 75%' },
+                opacity: 1, y: 0, duration: 1, delay: 0.2, ease: 'power3.out'
+            });
+            gsap.to('#bride-card', {
+                scrollTrigger: { trigger: '#couple', start: 'top 70%' },
+                opacity: 1, y: 0, rotateX: 0, duration: 1, ease: 'antigrav'
+            });
+            gsap.to('#conn', {
+                scrollTrigger: { trigger: '#couple', start: 'top 68%' },
+                opacity: 1, scale: 1, rotation: 0, duration: 0.8, delay: 0.3, ease: 'bloom'
+            });
+            gsap.to('#groom-card', {
+                scrollTrigger: { trigger: '#couple', start: 'top 70%' },
+                opacity: 1, y: 0, rotateX: 0, duration: 1, delay: 0.2, ease: 'antigrav'
+            });
+
+            // event
+            gsap.to('.ev-eyebrow', {
+                scrollTrigger: { trigger: '#event', start: 'top 78%' },
+                opacity: 1, y: 0, duration: 0.8, ease: 'power2.out'
+            });
+            gsap.to('.ev-title', {
+                scrollTrigger: { trigger: '#event', start: 'top 75%' },
+                opacity: 1, y: 0, duration: 1, delay: 0.2, ease: 'power3.out'
+            });
+            // cards with staggered skew correction
+            const evTL = gsap.timeline({
+                scrollTrigger: { trigger: '#event .ev-grid', start: 'top 80%' }
+            });
+            evTL.to('#ec1', { opacity: 1, y: 0, skewY: 0, duration: 0.9, ease: 'power3.out' })
+                .to('#ec2', { opacity: 1, y: 0, skewY: 0, duration: 0.9, ease: 'power3.out' }, '-=0.6');
+
+            // countdown
+            gsap.to('.cd-label', {
+                scrollTrigger: { trigger: '#countdown', start: 'top 78%' },
+                opacity: 1, duration: 0.8, ease: 'power2.out'
+            });
+            gsap.to('.cd-title', {
+                scrollTrigger: { trigger: '#countdown', start: 'top 75%' },
+                opacity: 1, duration: 1, delay: 0.2, ease: 'power3.out'
+            });
+            gsap.to('.cd-unit', {
+                scrollTrigger: { trigger: '#countdown', start: 'top 75%' },
+                opacity: 1, y: 0, scale: 1, duration: 0.8,
+                stagger: { amount: 0.4, ease: 'power2.inOut' },
+                ease: 'antigrav'
+            });
+
+            // rsvp
+            gsap.to('.rv-eyebrow', {
+                scrollTrigger: { trigger: '#rsvp', start: 'top 78%' },
+                opacity: 1, y: 0, duration: 0.8, ease: 'power2.out'
+            });
+            gsap.to('.rv-title', {
+                scrollTrigger: { trigger: '#rsvp', start: 'top 75%' },
+                opacity: 1, y: 0, duration: 1, delay: 0.2, ease: 'power3.out'
+            });
+            gsap.to('#rv-card', {
+                scrollTrigger: { trigger: '#rsvp', start: 'top 75%' },
+                opacity: 1, y: 0, duration: 1, delay: 0.4, ease: 'antigrav'
+            });
+
+            // footer
+            gsap.to('#ft-n', {
+                scrollTrigger: { trigger: 'footer', start: 'top 80%' },
+                opacity: 1, duration: 1, ease: 'power2.out'
+            });
+            gsap.to('#ft-t', {
+                scrollTrigger: { trigger: 'footer', start: 'top 75%' },
+                opacity: 1, duration: 1, delay: 0.3, ease: 'power2.out'
+            });
+
+            // PARALLAX on hero text
+            gsap.to('.hero-name', {
+                yPercent: -15,
+                ease: 'none',
+                scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true }
+            });
+            gsap.to('.hero-tagline', {
+                yPercent: -30,
+                ease: 'none',
+                scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true }
+            });
+        }
+
+        // ── COUNTDOWN ──
+        function startCountdown() {
+            const target = new Date('2025-07-12T08:00:00');
+            let lastSec = -1;
+            function tick() {
+                const now = new Date(), diff = target - now;
+                if (diff <= 0) {
+                    ['cd-days', 'cd-hours', 'cd-min', 'cd-sec'].forEach(id => {
+                        document.getElementById(id).textContent = '00';
+                    }); return;
+                }
+                const d = Math.floor(diff / 86400000);
+                const h = Math.floor((diff % 86400000) / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                document.getElementById('cd-days').textContent = String(d).padStart(2, '0');
+                document.getElementById('cd-hours').textContent = String(h).padStart(2, '0');
+                document.getElementById('cd-min').textContent = String(m).padStart(2, '0');
+                document.getElementById('cd-sec').textContent = String(s).padStart(2, '0');
+                if (s !== lastSec) {
+                    lastSec = s;
+                    gsap.fromTo('#cdu-s', { y: -8, opacity: 0.4 }, { y: 0, opacity: 1, duration: 0.35, ease: 'power2.out' });
+                    if (s === 0) gsap.fromTo('#cdu-m', { y: -8, opacity: 0.4 }, { y: 0, opacity: 1, duration: 0.35, ease: 'power2.out' });
+                }
+            }
+            tick(); setInterval(tick, 1000);
+        }
+
+        // ── RSVP ──
+        function submitRSVP() {
+            const name = document.getElementById('fname').value.trim();
+            const att = document.querySelector('input[name="att"]:checked');
+            if (!name) { shakeField('fname'); return; }
+            if (!att) { alert('Pilih kehadiranmu dulu ya 🌸'); return; }
+
+            const btn = document.querySelector('.submit-btn');
+            gsap.timeline()
+                .to(btn, { scale: 0.96, duration: 0.08, ease: 'power2.in' })
+                .to(btn, { scale: 1, duration: 0.15, ease: 'power2.out' })
+                .to('.fg', { opacity: 0, y: -15, stagger: 0.06, duration: 0.35, ease: 'power2.in' })
+                .to(btn, { opacity: 0, duration: 0.2, ease: 'power2.in' }, '-=0.2')
+                .call(() => {
+                    document.querySelectorAll('.fg').forEach(f => f.style.display = 'none');
+                    btn.style.display = 'none';
+                    const suc = document.getElementById('suc');
+                    suc.style.display = 'block';
+                    gsap.fromTo(suc,
+                        { opacity: 0, y: 40, scale: 0.85 },
+                        { opacity: 1, y: 0, scale: 1, duration: 1, ease: 'bloom' }
+                    );
+                    // release petals
+                    gsap.to('#petal-canvas', { opacity: 1, duration: 0.5 });
+                    startPetalBurst();
+                });
+        }
+
+        function shakeField(id) {
+            gsap.to('#' + id, {
+                x: [-6, 6, -5, 5, -3, 3, 0],
+                duration: 0.4, ease: 'power2.inOut',
+                borderColor: 'var(--rose)',
+                onComplete: () => gsap.to('#' + id, { borderColor: '', duration: 0.3 })
+            });
+        }
+    </script>
+</body>
+
+</html>
